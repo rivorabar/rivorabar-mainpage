@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Rivora Bar — ระบบสมาชิก</title>
+  <style>
+    :root{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#111;background:#fff}
+    *{box-sizing:border-box}body{margin:0;background:#fff}.container{width:100%;max-width:430px;margin:0 auto;padding:22px 18px 32px}
+    a{color:inherit}.back{display:inline-block;margin-bottom:30px;color:#555;font-size:.92rem;text-decoration:none}.eyebrow{margin:0;color:#7b6248;font-size:.74rem;font-weight:800;letter-spacing:.14em}.title{font-size:2.1rem;margin:6px 0 8px;letter-spacing:-.04em}.intro{margin:0 0 25px;color:#666;line-height:1.5}
+    .lookup{border:2px solid #111;border-radius:16px;padding:18px}.lookup h2{font-size:1.15rem;margin:0 0 16px}.lookup label{display:block;font-size:.86rem;font-weight:700;margin-bottom:7px}.row{display:flex;gap:8px}input{width:100%;min-width:0;height:52px;padding:0 13px;border:1.5px solid #777;border-radius:10px;font:inherit;color:#111}button,.signup{min-height:52px;padding:0 15px;border:2px solid #111;border-radius:10px;background:#111;color:#fff;font:inherit;font-weight:750;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;justify-content:center}.message{min-height:20px;margin:12px 0 0;color:#555;font-size:.88rem}
+    .card{margin-top:20px;border:2px solid #111;border-radius:16px;overflow:hidden;background:#fff}.card-top{display:flex;justify-content:space-between;gap:12px;padding:13px 16px;background:#f1f1f1;font-size:.72rem;font-weight:800;letter-spacing:.1em}.gold{color:#7b6248}.content{padding:20px}.welcome{margin:0;color:#7b6248;font-size:.73rem;font-weight:800;letter-spacing:.12em}.name{font-size:2.25rem;margin:7px 0 24px;letter-spacing:-.05em}.stats{display:grid;grid-template-columns:1fr 1fr;border-block:1px solid #c9c9c9}.stats div{padding:14px 0}.stats div+div{border-left:1px solid #c9c9c9;padding-left:15px}.stats span,.section-label{font-size:.7rem;font-weight:800;letter-spacing:.11em;color:#555}.stats strong{display:block;margin-top:4px;font-size:1.18rem}.section{margin-top:18px}.section p{margin:6px 0 0;line-height:1.45}.join{text-align:center;margin-top:25px}.join p{color:#666;margin:0 0 10px}.signup{width:100%;background:#fff;color:#111}
+    @media(max-width:360px){.row{flex-direction:column}.row button{width:100%}}
+  </style>
+</head>
+<body>
+  <main class="container">
+    <a class="back" href="./">← กลับหน้า Rivora Bar</a>
+    <p class="eyebrow">RIVORA BAR</p><h1 class="title">ระบบสมาชิก</h1>
+    <p class="intro">ตรวจสอบสถานะและสิทธิประโยชน์ของคุณ</p>
+    <section class="lookup"><h2>ตรวจสอบสถานะสมาชิก</h2><label for="phone">เบอร์โทรศัพท์</label>
+      <div class="row"><input id="phone" inputmode="numeric" autocomplete="tel" placeholder="เช่น 0812345678" maxlength="13"><button id="search">ตรวจสอบ</button></div>
+      <p class="message" id="message" role="status"></p>
+    </section>
+    <section class="card" id="card" hidden>
+      <div class="card-top"><span>RIVORA MEMBER</span><span class="gold" id="member-id"></span></div>
+      <div class="content"><p class="welcome">WELCOME BACK</p><h2 class="name" id="name"></h2>
+        <div class="stats"><div><span>RANK</span><strong id="rank"></strong></div><div><span>VISITS</span><strong id="visit"></strong></div></div>
+        <div class="section"><span class="section-label">BADGES</span><p id="badges"></p></div>
+        <div class="section"><span class="section-label">YOUR BENEFIT</span><p id="benefit"></p></div>
+      </div>
+    </section>
+    <section class="join"><p>สนใจเป็นส่วนหนึ่งของเรา?</p><a class="signup" href="https://docs.google.com/forms/d/e/1FAIpQLSdDMfpDNKN6FwWJSVDAqcvL5-1U75qVJRx21R0RDXQNOPHwYg/viewform">สมัครสมาชิกฟรี</a></section>
+  </main>
+  <script>
+    const SEARCH_ENDPOINT = "PASTE_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE";
+    const $ = id => document.getElementById(id);
+    function lookup(){
+      const phone = $('phone').value.replace(/\D/g,''); $('card').hidden=true;
+      if(!/^0\d{9}$/.test(phone)){ $('message').textContent='กรุณากรอกเบอร์มือถือ 10 หลัก เช่น 0812345678'; return; }
+      if(SEARCH_ENDPOINT.startsWith('PASTE_')){ $('message').textContent='กำลังรอเชื่อมต่อข้อมูลสมาชิก'; return; }
+      $('message').textContent='กำลังตรวจสอบ…';
+      fetch(SEARCH_ENDPOINT+'?phone='+encodeURIComponent(phone)).then(r=>r.json()).then(show).catch(()=>{$('message').textContent='ตรวจสอบข้อมูลไม่สำเร็จ กรุณาลองใหม่'});
+    }
+    function show(m){
+      if(!m || !m.found){ $('message').textContent=(m&&m.error)||'ยังไม่พบข้อมูลสมาชิก กรุณาสมัครสมาชิกฟรี'; return; }
+      $('member-id').textContent=m.memberId; $('name').textContent=m.alias||m.nickname; $('rank').textContent=m.rank; $('visit').textContent=m.visits; $('badges').textContent=(m.badges||[]).join(' · ')||'—'; $('benefit').textContent=m.benefit; $('card').hidden=false; $('message').textContent='พบข้อมูลสมาชิกแล้ว';
+    }
+    $('search').addEventListener('click',lookup); $('phone').addEventListener('keydown',e=>{if(e.key==='Enter')lookup()});
+  </script>
+</body>
+</html>
