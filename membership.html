@@ -44,15 +44,10 @@
     }
     function show(m){
       if(!m || !m.found){ $('message').textContent=(m&&m.error)||'ยังไม่พบข้อมูลสมาชิก กรุณาสมัครสมาชิกฟรี'; return; }
-      $('member-id').textContent=m.memberId;
-$('name').textContent=m.alias||m.nickname;
-$('rank').textContent=m.rank;
-$('visit').textContent=m.visits;
-$('badges').textContent=(m.badges||[]).join(' · ')||'—';
-$('benefit').innerHTML=(m.benefit||'').replace(/\n/g,'<br>');
-$('card').hidden=false;
-$('message').textContent='พบข้อมูลสมาชิกแล้ว';
+      $('member-id').textContent=m.memberId; $('name').textContent=m.alias||m.nickname; $('rank').textContent=m.rank; $('visit').textContent=m.visits; $('badges').textContent=(m.badges||[]).join(' · ')||'—'; $('benefit').textContent=m.benefit; $('card').hidden=false; $('message').textContent='พบข้อมูลสมาชิกแล้ว';
+    }
     $('search').addEventListener('click',lookup); $('phone').addEventListener('keydown',e=>{if(e.key==='Enter')lookup()});
   </script>
 </body>
+</html>
 </html>
